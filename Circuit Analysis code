@@ -1,0 +1,70 @@
+#include <iostream>
+#include <vector>
+using namespace std;
+
+class Resistors {
+public:
+    vector<double> data;
+
+    double& operator()(int i) {
+        return data[i];
+    }
+};
+
+int main() {
+    int n;
+    cout << "Enter number of resistors: ";
+    cin >> n;
+
+    Resistors resistors;
+    resistors.data.resize(n);
+
+    cout << "Enter resistance values (ohms):\n";
+    for (int i = 0; i < n; i = i + 1) {
+        cin >> resistors(i);
+    }
+
+    double voltage;
+    cout << "Enter total voltage (volts): ";
+    cin >> voltage;
+
+    // SERIES
+    double seriesTotal = 0;
+    for (int i = 0; i < n; i = i + 1) {
+        seriesTotal = seriesTotal + resistors(i);
+    }
+
+    cout << "\nTotal Series Resistance: " << seriesTotal << " ohms\n";
+
+    cout << "Voltage Drops (Series):\n";
+    for (int i = 0; i < n; i = i + 1) {
+        double drop = (resistors(i) / seriesTotal) * voltage;
+        cout << "R" << i + 1 << ": " << drop << " V\n";
+    }
+
+    // PARALLEL
+    double reciprocalSum = 0;
+    for (int i = 0; i < n; i = i + 1) {
+        if (resistors(i) != 0) {
+            reciprocalSum = reciprocalSum + (1 / resistors(i));
+        }
+    }
+
+    double parallelTotal = 0;
+    if (reciprocalSum != 0) {
+        parallelTotal = 1 / reciprocalSum;
+    }
+
+    cout << "\nTotal Parallel Resistance: " << parallelTotal << " ohms\n";
+
+    cout << "Currents (Parallel):\n";
+    for (int i = 0; i < n; i = i + 1) {
+        double current = 0;
+        if (resistors(i) != 0) {
+            current = voltage / resistors(i);
+        }
+        cout << "R" << i + 1 << ": " << current << " A\n";
+    }
+
+    return 0;
+}
