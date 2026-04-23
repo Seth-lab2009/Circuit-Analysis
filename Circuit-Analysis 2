@@ -1,0 +1,111 @@
+#include <iostream>
+#include <vector>
+#include <numeric>
+
+using namespace std;
+// Here is where I display all of the functions that I will use
+void fail(const string& prompt, double& value);
+void intro(double& choice,double& V);
+void seriesCircuit(double& V, double& It,double& ResistorSeries, double& repeat, double& Rt, vector<double>& resistor);
+void parallelCircuit(double& It,double& V, double& amountPGroups, double& amountRP, double& ResistorParallel, double& Rt, double& amountP, vector<double>& parallels, double& series, double& ResistorSeries);
+void displayTotal(double& Rt);
+// The intro starts here
+int main() {
+	double V, It, choice, resistorSeries, resistorParallel, amountRP, series, amountP, amountPGroups;
+	double repeat = 1;
+	double Rt = 0;
+	vector<double> parallels = {};
+	vector<double> resistor = {};
+
+	intro(choice, V);
+
+	if (choice == 1) {
+		seriesCircuit(V, It, resistorSeries, repeat, Rt, resistor);
+	} else {
+		parallelCircuit(It, V, amountPGroups, amountRP, resistorParallel, Rt, amountP, parallels, series, resistorSeries);
+	}
+
+	void displayTotal(double& Rt);
+	return 0;
+	// Below is the fail statement that makes sure that only valid inputs are valid
+}
+void fail(const string& prompt, double& value) {
+	while (true) {
+		cout << prompt;
+		cin >> value;
+		if (cin.fail()) {
+			cin.clear();
+			cin.ignore(1000, '\n');
+			cout << "Invalid input. Try again.\n";
+		} else {
+			break;
+		}
+	}
+}
+// The user will be presented with this screen upon running the program
+void intro(double& choice, double& V) {
+	cout << "This program calculates the total resistance and voltage for series and parallel circuits\n" << endl;
+	fail("Enter 1 for series, 2 for parallel: ", choice);
+	fail("what is the voltage?\n", V);
+}
+// This is what happens whenever the user selects series circuit
+void seriesCircuit(double& V, double& It,double& resistorSeries, double& repeat, double& Rt, vector<double>& resistor) {
+	cout << "You have selected series circuit\n";
+	do {
+		fail("Please enter value of resistor\n", resistorSeries);
+		resistor.push_back(resistorSeries);
+		fail("is there another resistor, press 1 for yes and 2 for no\n", repeat);
+	} while (repeat == 1);
+
+	Rt = accumulate(resistor.begin(), resistor.end(), 0.0);
+	It = V / Rt;
+
+	for (int Rnum : resistor) {
+		int R =  Rnum*It;
+		cout << "Resistor: " << Rnum << " | voltage drop: " << R << endl;
+	}
+}
+// And here is the other option where the user selected the Parallel Circuit.
+void parallelCircuit(double& It, double& V, double& amountPGroups, double& amountRP, double& resistorParallel, double& Rt, double& amountP, vector<double>& parallels, double& series, double& resistorSeries) {
+	cout << "You have selected parallel circuit\n";
+	fail("How many parallel groups? ", amountPGroups);
+
+	do {
+		parallels.clear();
+		fail("How many resistors are in this group? ", amountRP);
+		do {
+			fail("Value of one of the resistors: ", resistorParallel);
+			fail( "Value of the other resistors: ", resistorParallel);
+			parallels.push_back(resistorParallel);
+			amountRP--;
+		} while (amountRP > 0);
+
+		double Psum = accumulate(parallels.begin(), parallels.end(), 0.0, [](double acc, double val) {
+			return acc + (1.0 / val);
+		});
+		Rt = Rt + (1.0 / Psum);
+		amountPGroups--;
+	} while (amountPGroups > 0);
+// If the user has any resistors in series, this is where it goes
+	fail("Any resistors within series? (1 for yes, 2 for no): ", series);
+	if (series == 1) {
+		fail("How many resistors are in series? ", amountP);
+		do {
+			fail("Value of the next resistor: ", resistorSeries);
+			Rt = Rt + resistorSeries;
+			amountP--;
+		} while (amountP > 0);
+	}
+	It = V / Rt;
+	for (int PRnum : parallels) {
+		// The final part of the program will be displayed here 
+		int P =  It*(Rt/PRnum);
+		cout << "Resistor: " << PRnum << " | Current through the resistor is: " << P << endl;
+	}
+
+}
+
+void DisplayTotal(double& Rt) {
+	cout << " The Total Resistance (Rt) is: " << Rt << endl;
+}
+//  Program ends here
