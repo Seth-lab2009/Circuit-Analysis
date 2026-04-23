@@ -1,17 +1,4 @@
-#include <iostream>
-#include <vector>
-using namespace std;
-
-class Resistors {
-public:
-    vector<double> data;
-
-    double& operator()(int i) {
-        return data[i];
-    }
-};
-
-int main() {
+{
     int n;
     cout << "Enter number of resistors: ";
     cin >> n;
